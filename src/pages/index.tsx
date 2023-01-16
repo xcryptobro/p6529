@@ -3,6 +3,13 @@ import Head from "next/head";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { pixelMap } from '../utils/pixels'
 
+const backgroundIndicies = [
+555, 531, 507, 482, 458, 433, 409, 385, 361, 337, 314, 290, 266, 243, 219, 195, 172, 149, 126, 103, 80, 81, 58, 59, 60, 85, 86, 111, 136, 161, 186, 211, 235, 259, 284, 308, 332, 357, 381, 405, 429, 453, 476, 499, 522, 545, 568,
+554, 530, 506, 481, 457, 432, 408, 384, 360, 336, 313, 289, 265, 242, 218, 194, 171, 148, 125, 102, 79, 56, 57, 34, 35, 36, 61, 62, 87, 112, 137, 162, 187, 212, 236, 260, 285, 309, 333, 358, 382, 406, 430, 454, 477, 500, 523, 546, 569,
+553, 529, 505, 480, 456, 312, 288, 264, 241, 217, 193, 170, 147, 124, 101, 78, 55, 32, 33, 10, 11, 12, 37, 38, 63, 88, 113, 138, 163, 188, 213, 237, 261, 286, 310, 334, 359, 383, 407, 431, 455, 478, 501, 524, 547, 570
+
+]
+
 const outlineIndicies = [556, 532, 508, 483, 459, 434, 410, 386, 362, 338, 315, 291, 267, 244, 220, 196, 173, 150, 127, 104, 105, 82, 83, 84, 109, 110, 
 135, 160, 185, 210, 234, 258, 283, 307, 331, 356, 380, 404, 428, 452, 475, 498, 521, 544, 567, 566, 565,
 558, 534, 510, 485, 461, 436, 412, 388, 364, 340, 317, 293, 246, 223, 200, 201, 202, 203, 204, 205, 206, 231, 305, 329, 354, 378, 402, 426, 450, 473, 496, 519, 518, 517, 540, 563, 562,
@@ -16,6 +23,19 @@ const hoodIndicies = [130, 207, 197, 179, 520, 316, 128, 387, 509, 282, 181, 151
 const toneIndicies = [370, 536, 229, 318, 375, 225, 397, 463, 300, 368, 227, 511, 348, 247, 350, 561, 345, 513, 395, 488, 343, 252, 559, 295, 393, 347,
 398, 224, 537, 369, 230, 487, 324, 351, 319, 535, 396, 226, 374, 294, 346, 371, 560, 344, 228, 394, 512, 349]
 
+const shadowIndicies = [
+439, 464, 489, 
+367, 392, 417, 442, 467, 492, 
+420, 445, 470,
+423, 
+391, 415, 416, 440, 441, 465, 466, 489, 490, 491,
+418, 419, 443, 444, 468, 469, 493, 494, 
+421, 422, 446, 447, 471,
+399
+]
+
+const lensIndicies = [273, 278, 298, 303, 297, 302, 274, 279]
+
 const Home: NextPage = () => {
   const miniRef = useRef<HTMLCanvasElement>(null);
   const lrgRef = useRef<HTMLCanvasElement>(null);
@@ -28,12 +48,12 @@ const Home: NextPage = () => {
       case 2: return [40, 27, 10]
       case 3: return [40, 27, 10]
       case 4: return [40, 27, 10]
-      case 5: return [112, 213, 209]
-      case 6: return [134, 105, 71]
+      case 5: return [255, 255, 255]
+      case 6: return [255, 255, 255]
       case 7: return [255, 255, 255]
       case 8: return [255, 255, 255]
       case 9: return [255, 255, 255]
-      case 10: return [100, 128, 140]
+      case 10: return [255, 255, 255]
     }
     return [230, 230, 230]
   }
@@ -51,11 +71,28 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      colorIndex(hoodIndicies[frame] as number, 'rgb(67, 67, 67)')
-      colorIndex(outlineIndicies[frame] as number, 'rgb(0, 0, 0)')
-      colorIndex(toneIndicies[frame] as number, 'rgb(209, 162, 108)')
+      const background = backgroundIndicies.length
+      const outline = background + outlineIndicies.length
+      const hood = outline + hoodIndicies.length
+      const tone = hood + toneIndicies.length
+      const shadow = tone + shadowIndicies.length
+      const lens = shadow + lensIndicies.length
+
+      if (frame < background) {
+        colorIndex(backgroundIndicies[frame] as number, 'rgb(100, 128, 140)')
+      } else if (frame >= background && frame < outline) {
+        colorIndex(outlineIndicies[frame-background] as number, 'rgb(0, 0, 0)')
+      } else if (frame >= outline && frame < hood) {
+        colorIndex(hoodIndicies[frame-outline] as number, 'rgb(67, 67, 67)')
+      } else if (frame >= hood && frame < tone) {
+        colorIndex(toneIndicies[frame-hood] as number, 'rgb(209, 162, 108)')
+      } else if (frame >= tone && frame < shadow) {
+        colorIndex(shadowIndicies[frame-tone] as number, 'rgb(134, 105, 71)')
+      } else if (frame >= shadow && frame < lens) {
+        colorIndex(lensIndicies[frame-shadow] as number, 'rgb(112, 213, 209)')
+      }
       setFrame(frame+1)
-    }, 125)
+    }, 10)
   }, [frame, colorIndex])
 
   useEffect(() => {
